@@ -1,0 +1,16 @@
+* {
+  --primary-color: #7c83fd;
+  --secondary-color: #96baff;
+  --third-color: #7dedff;
+  --fourth-color: #88fff7;
+}
+.character-style-1 {
+  font-weight: 600;
+  font-style: bold;
+}
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
