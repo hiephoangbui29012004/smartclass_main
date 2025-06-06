@@ -159,108 +159,108 @@ const AccountModal = ({ type, data, handleClose }: IAccountModalProps) => {
             )}
             name="username"
             control={control}
-          />
-          {type === "add" && (
-            <Controller
-              rules={{ required: "true" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  error={errors.password !== undefined}
-                  helperText={
-                    errors.password ? "Bạn chưa điền trường này" : undefined
-                  }
-                  type="password"
-                  variant="outlined"
-                  label="Mật khẩu"
-                  className={classes.input}
-                  margin="normal"
-                />
-              )}
-              name="password"
-              control={control}
-            />
-          )}
-          <Controller
-            rules={{ required: "true" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                error={errors.fullname !== undefined}
-                helperText={
-                  errors.fullname ? "Bạn chưa điền trường này" : undefined
-                }
-                variant="outlined"
-                label="Tên đầy đủ"
-                className={classes.input}
-                margin="normal"
-              />
-            )}
-            name="fullname"
-            control={control}
-          />
+           />
+           {type === "add" && (
+             <Controller
+               rules={{ required: "true" }}
+               render={({ field }) => (
+                 <TextField
+                   {...field}
+                   error={errors.password !== undefined}
+                   helperText={
+                     errors.password ? "Bạn chưa điền trường này" : undefined
+                   }
+                   type="password"
+                   variant="outlined"
+                   label="Mật khẩu"
+                   className={classes.input}
+                   margin="normal"
+                 />
+               )}
+               name="password"
+               control={control}
+             />
+           )}
+           <Controller
+             rules={{ required: "true" }}
+             render={({ field }) => (
+               <TextField
+                 {...field}
+                 error={errors.fullname !== undefined}
+                 helperText={
+                   errors.fullname ? "Bạn chưa điền trường này" : undefined
+                 }
+                 variant="outlined"
+                 label="Tên đầy đủ"
+                 className={classes.input}
+                 margin="normal"
+               />
+             )}
+             name="fullname"
+             control={control}
+           />
 
-          <FormControl variant="outlined" className={classes.select}>
-            <InputLabel id="demo-simple-select-outlined-label">
-              Chức vụ
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              label="Chức vụ"
-              defaultValue={type === "edit" ? data.role : 0}
-              {...register("role", { required: "true" })}
-            >
-              <MenuItem value={0}>Người dùng</MenuItem>
-              <MenuItem value={1}>Người quản trị</MenuItem>
-            </Select>
-          </FormControl>
-          <Controller
-            render={({ field }) => (
-              <TextField
-                {...field}
-                multiline
-                rows={4}
-                variant="outlined"
-                label="Chi tiết"
-                className={classes.input}
-                margin="normal"
-              />
-            )}
-            name="description"
-            control={control}
-          />
-          {type === "edit" && (
-            <Button
-              color="primary"
-              variant="outlined"
-              className={classes.btnResetpass}
-              onClick={onResetPasswordClick}
-            >
-              Đặt lại mật khẩu
-            </Button>
-          )}
-        </Paper>
-        <div className={classes.footer}>
-          <Button
-            type="submit"
-            className={classes.btn}
-            variant="contained"
-            color="primary"
-          >
-            OK
-          </Button>
-          <Button
-            className={classes.btn}
-            variant="contained"
-            color="secondary"
-            onClick={handleClose}
-          >
-            Hủy bỏ
-          </Button>
-        </div>
-      </form>
-    </div>
+           <FormControl variant="outlined" className={classes.select}>
+             <InputLabel id="demo-simple-select-outlined-label">
+               Chức vụ
+             </InputLabel>
+             <Select
+               labelId="demo-simple-select-outlined-label"
+               id="demo-simple-select-outlined"
+               label="Chức vụ"
+               defaultValue={type === "edit" ? data.role : 0}
+               {...register("role", { required: "true" })}
+             >
+               <MenuItem value={0}>Người dùng</MenuItem>
+               <MenuItem value={1}>Người quản trị</MenuItem>
+             </Select>
+           </FormControl>
+           <Controller
+             render={({ field }) => (
+               <TextField
+                 {...field}
+                 multiline
+                 rows={4}
+                 variant="outlined"
+                 label="Chi tiết"
+                 className={classes.input}
+                 margin="normal"
+               />
+             )}
+             name="description"
+             control={control}
+           />
+           {type === "edit" && (
+             <Button
+               color="primary"
+               variant="outlined"
+               className={classes.btnResetpass}
+               onClick={onResetPasswordClick}
+             >
+               Đặt lại mật khẩu
+             </Button>
+           )}
+         </Paper>
+         <div className={classes.footer}>
+           <Button
+             type="submit"
+             className={classes.btn}
+             variant="contained"
+             color="primary"
+           >
+             OK
+           </Button>
+           <Button
+             className={classes.btn}
+             variant="contained"
+             color="secondary"
+             onClick={handleClose}
+           >
+             Hủy bỏ
+           </Button>
+         </div>
+       </form>
+     </div>
   );
 };
 
