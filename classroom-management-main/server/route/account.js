@@ -40,6 +40,7 @@ router.get("/export/", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 //@route get /api/account/
 //@desp get all account
 //@private access
@@ -58,6 +59,7 @@ router.get("/", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 //@route put /api/account/:useId
 //@desp update account by id
 //@private access
@@ -93,56 +95,42 @@ router.post("/", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 //@route get /api/account/:useId
 //@desp get account by id
 //@private access
-router.get("/:useId", async (req, res) => {
-  const { accRole } = req.body;
+// Trong hàm resetPassword ở backend của bạn
+router.put("/reset-password/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // ... (tạo mật khẩu mới và hash)
+    const newPassword = generateRandomPassword(12); // Hàm tạo password của bạn
+    const hashedPassword = await argon2.hash(newPassword);
 
-  if (accRole === 0)
-    return res.status(405).json({ error: "Method Not Allowed " });
-  try {
-    const account = await Account.findOne({
-      where: { id: req.params.useId },
-    });
-    res.json({
-      success: true,
-      message: "Success",
-      data: account,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-//@route put /api/account/:useId
-//@desp update account by id
-//@private access
-router.put("/:useId", async (req, res) => {
-  const { password, fullname, role, email, accRole } = req.body;
-  if (accRole === 0)
-    return res.status(405).json({ error: "Method Not Allowed " });
-  try {
-    const hashPassword = await argon2.hash(password);
-    await Account.update(
-      {
-        password: hashPassword,
-        fullname: fullname || "",
-        role: role || 0,
-        email: email || "",
-      },
-      {
-        where: { id: req.params.useId },
-      }
+    // ĐIỂM CỰC KỲ QUAN TRỌNG: ĐẢM BẢO CÓ 'await' VÀ KIỂM TRA KẾT QUẢ
+    const [rowsAffected] = await Account.update(
+      { password: hashedPassword },
+      { where: { id: id } }
     );
-    res.json({
+
+    console.log(`Updated ${rowsAffected} rows for user ID: ${id}`); // Log số hàng bị ảnh hưởng
+
+    if (rowsAffected === 0) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản để đặt lại mật khẩu." });
+    }
+
+    return res.json({
       success: true,
-      message: "Success",
+      message: "Đặt lại mật khẩu thành công",
+      data: { newPassword: newPassword }, // Trả về mật khẩu chưa hash cho frontend
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error("Lỗi khi đặt lại mật khẩu:", error);
+    return res.status(500).json({ error: "Lỗi server nội bộ khi đặt lại mật khẩu." });
   }
 });
+
+
 //@route delete /api/account/:useId
 //@desp delete account by id
 //@private access
@@ -166,6 +154,7 @@ router.delete("/:useId", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 //@route get /api/account/reset-password/:useId
 //@desp get account by id
 //@private access
@@ -194,6 +183,7 @@ router.get("/reset-password/:useId", async (req, res) => {
     console.log("Generated password (before hashing):", password);
     const hashedPassword = await argon2.hash(password);
     console.log("Hashed password:", hashedPassword);
+    console.log("ID được sử dụng để update:", req.params.useId);
     
     await Account.update(
       {
