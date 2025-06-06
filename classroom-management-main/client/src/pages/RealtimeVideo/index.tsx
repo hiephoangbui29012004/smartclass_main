@@ -42,8 +42,13 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
     },
     liveVideo: {
-      width: "640px",
-      height: "320px",
+      width: "100%", // Chiếm toàn bộ chiều rộng của phần tử cha
+      maxWidth: "1280px", // Đảm bảo không quá lớn nếu phần tử cha quá rộng
+      height: "auto", // Tự động tính chiều cao để giữ tỷ lệ
+      aspectRatio: "16 / 9", // Thêm dòng này để cố định tỷ lệ 16:9 cho khung hình (hiện đại hơn width/height)
+                           // Đảm bảo tỷ lệ này khớp với output của FFmpeg ở backend
+      objectFit: "contain",
+      display: "block",
     },
     select: {
       width: "50%",
@@ -58,12 +63,18 @@ const RealtimeVideo = (props: Props) => {
 
   const [src, setSrc] = React.useState<any>();
   const [camId, setcamId] = React.useState<any>(null);
+  const animationFrameRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     return () => {
-      if (refSocket?.current) refSocket.current.removeAllListeners();
+      if (refSocket.current) {
+        refSocket.current.removeAllListeners();
+        refSocket.current.disconnect(); // Đảm bảo disconnect khi component unmount
+      }
+      if (animationFrameRef.current) { // Hủy animation frame khi component bị hủy
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -91,34 +102,47 @@ const RealtimeVideo = (props: Props) => {
           ))}
         </Select>
         <Button
-          style={{ marginLeft: "2rem" }}
-          color="primary"
-          onClick={() => {
-            videoService.getStream(camId).then(() => {
-              if (refSocket.current) {
-                refSocket.current.disconnect();
-                refSocket.current.removeAllListeners();
-              }
-              refSocket.current = io(location.origin + `/cam${camId}`);
-              refSocket.current.on("data", function (data: any) {
-                console.log("📡 Received data from server:", data);
-                setSrc("data:image/jpeg;base64," + data);
-              });
-            });
-          }}
-        >
-          Xem
-        </Button>
+  style={{ marginLeft: "2rem" }}
+  color="primary"
+  onClick={() => {
+    videoService.getStream(camId).then(() => {
+      if (refSocket.current) {
+        refSocket.current.disconnect();
+        refSocket.current.removeAllListeners();
+      }
+      // Đảm bảo dòng này đang sử dụng biến môi trường:
+      const socketUrl = `${process.env.REACT_APP_SOCKET_URL}/cam${camId}`;
+          console.log("Attempting to connect Socket.IO to:", socketUrl);
+          // KẾT THÚC ĐOẠN CODE THÊM
+
+          refSocket.current = io(socketUrl);
+
+      refSocket.current.on("connect", () => {
+        console.log("✅ Socket.IO connected!");
+      });
+      refSocket.current.on("connect_error", (error: any) => {
+        console.error("❌ Socket.IO connection error:", error);
+      });
+      refSocket.current.on("data", function (data: any) {
+        console.log("📡 Received data from server. Data size:", data.length);
+        setSrc("data:image/jpeg;base64," + data);
+      });
+      refSocket.current.on("disconnect", () => {
+        console.log("👋 Socket.IO disconnected.");
+      });
+    });
+  }}
+>
+  Xem
+</Button>
       </Paper>
       <Paper className={classes.content}>
-        <img
-          className={classes.liveVideo}
-          id="live-video-div"
-          src={src}
-          alt=""
-          width={640}
-          height={320}
-        ></img>
+      <img
+  className={classes.liveVideo}
+  id="live-video-div"
+  src={src}
+  alt=""
+></img>
       </Paper>
     </div>
   );
